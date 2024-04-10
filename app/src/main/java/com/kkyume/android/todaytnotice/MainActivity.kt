@@ -4,11 +4,20 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import com.kkyume.android.todaytnotice.databinding.ActivityMainBinding
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
 import java.io.BufferedReader
+import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.PrintWriter
+import java.lang.Exception
+import java.net.HttpURLConnection
 import java.net.ServerSocket
+import java.net.Socket
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding : ActivityMainBinding
@@ -17,40 +26,26 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val client = OkHttpClient()
 
-        Thread{
-            val port = 8080
-            val server = ServerSocket(port)
+        val request : Request = Request.Builder()
+            .url("http://10.0.2.2:8080")
+            .build()
 
-            val socket = server.accept()
-
-            /**
-             *  socket.getInputStream() // 클라이언트로부터 들어오는 스트림 == 클라이언틔 socket.outputStream
-             *  socket.getOutputStream()  // 클라이언트에게 데이터를 주는 스트림 == socket.inputStream
-             */
-
-            val reader = BufferedReader(InputStreamReader(socket.getInputStream()))
-            val printer = PrintWriter(socket.getOutputStream())
-
-            var input : String ?= "-1"
-            while (input != null && input != ""){
-                input = reader.readLine()
+        val callback = object :Callback{
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e("Client", e.toString())
             }
 
-            Log.e("SERVER", "Read Data $input")
+            override fun onResponse(call: Call, response: Response) {
+                //body 객체를 스트링으로 읽겠다.
+                if (response.isSuccessful){
+                    Log.e("Client", "${response.body?.string()}")
+                }
+            }
 
-            //순서 잘 맞아아ㅑ햄
-
-            printer.println("HTTP/1.1 200 OK")
-            printer.println("Content-Type : text/html\r\n")
-
-            printer.println("<h1> Hello World </h1>")
-            printer.println("\r\n")
-            printer.flush()
-            printer.close()
-
-            reader.close()
-        }.start()
+        }
+           client.newCall(request).enqueue(callback) // 바로 실행
 
     }
 }
