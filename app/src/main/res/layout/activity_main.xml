@@ -15,12 +15,16 @@
         app:layout_constraintStart_toStartOf="parent"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:hint="serverHost"
+        android:gravity="center"
+        android:layout_marginBottom="100dp"
 />
 
     <Button
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:id="@+id/confirmButton"
+        android:text="접속하기"
         app:layout_constraintTop_toBottomOf="@id/serverHostEditText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
